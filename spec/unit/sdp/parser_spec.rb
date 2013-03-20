@@ -151,4 +151,10 @@ describe SDP::Parser do
       sdp_hash[:session_section][:protocol_version].should == "456"
     end
   end
+
+  it "parses VQE Configs" do
+    expect {
+      subject.parse VQE_CONFIG
+    }.to_not raise_error Parslet::UnconsumedInput
+  end
 end

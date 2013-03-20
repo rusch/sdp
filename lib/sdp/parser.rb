@@ -53,7 +53,7 @@ class SDP::Parser < Parslet::Parser
   end
 
   rule(:bandwidth) do
-    str('b=') >> match('[\w]').repeat(2).as(:bandwidth_type) >> str(':') >>
+    str('b=') >> match('\w').repeat(2).as(:bandwidth_type) >> str(':') >>
       field_value.as(:bandwidth) >> eol
   end
 
@@ -113,7 +113,7 @@ class SDP::Parser < Parslet::Parser
 
   rule(:media_section) do
     media_description >> information.maybe >> connection_data.maybe >>
-      bandwidth.maybe >> encryption_keys.maybe >> attributes.maybe
+      bandwidth.repeat >> encryption_keys.maybe >> attributes.maybe
   end
 
   rule(:description) do

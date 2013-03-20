@@ -133,5 +133,49 @@ a=framesize:97 320-240\r
 b=AS:256\r
 a=control:trackID=2\r
 }
+
+  VQE_CONFIG = %{v=0
+o=- 1363765854985 1363767149403 IN IP4 zh-vq-1.wingo.ch
+s=SF1 HD (low bitrate)
+i=Channel configuration for SF1 HD (low bitrate) ( Unicast Retransmission Only )
+t=0 0
+a=rtcp-unicast:rsi
+a=group:FID 1 3
+m=video 49310 RTP/AVPF 96
+i=Original Source Stream
+c=IN IP4 239.186.54.152/255
+b=AS:6300
+b=RS:53
+b=RR:530000
+a=fmtp:96 rtcp-per-rcvr-bw=53
+a=recvonly
+a=source-filter: incl IN IP4 239.186.54.152 195.186.197.248
+a=rtpmap:96 MP2T/90000
+a=rtcp:49311 IN IP4 178.238.169.102
+a=rtcp-fb:96 nack
+a=rtcp-fb:96 nack pli
+a=rtcp-xr:pkt-loss-rle stat-summary=loss,dup,jitt post-repair-loss-rle multicast-acq vqe-diagnostic-counters
+a=mid:1
+m=video 49310 RTP/AVPF 98
+i=Re-sourced Stream
+c=IN IP4 239.186.54.152/255
+a=inactive
+a=source-filter: incl IN IP4 239.186.54.152 178.238.169.102
+a=rtpmap:98 MP2T/90000
+a=rtcp:49311 IN IP4 178.238.169.102
+a=mid:2
+m=video 50000 RTP/AVPF 99
+i=Unicast Retransmission Stream
+c=IN IP4 178.238.169.102
+b=RS:53
+b=RR:53
+a=recvonly
+a=rtpmap:99 rtx/90000
+a=rtcp:50001
+a=rtcp-xr:pkt-loss-rle stat-summary=loss,dup,jitt
+a=fmtp:99 apt=96
+a=fmtp:99 rtx-time=3000
+a=mid:3
+}
 end
 
