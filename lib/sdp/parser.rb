@@ -106,14 +106,15 @@ class SDP::Parser < Parslet::Parser
   rule(:session_description) do
     version.maybe >> origin.maybe >> session_name.maybe >>
       information.maybe >> uri.maybe >> email_address.maybe >>
-      phone_number.maybe >> connection_data.maybe >> bandwidth.maybe >>
+      phone_number.maybe >> connection_data.maybe >> bandwidth.repeat >>
       timing.maybe >> repeat_times.maybe >> time_zones.maybe >>
       encryption_keys.maybe >> attributes.maybe
   end
 
   rule(:media_section) do
     media_description >> information.maybe >> connection_data.maybe >>
-      bandwidth.repeat >> encryption_keys.maybe >> attributes.maybe
+      bandwidth.repeat.as(:bandwidths) >> encryption_keys.maybe >>
+      attributes.maybe
   end
 
   rule(:description) do
