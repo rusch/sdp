@@ -34,16 +34,19 @@ class SDP
   # @param [Hash] sdp_hash The parsed Hash.
   # @return [Hash] The converted Hash.
   def self.remove_parslet(sdp_hash)
-    clean_hash = {}
-
-    sdp_hash.each do |section, values|
-      clean_hash[section] = values.inject({}) do |result, (k, v)|
-        string_value = v.str
-        result[k] = Integer(string_value) rescue string_value
-        result
+    sdp_hash.inject({}) do |result, (k, v)|
+      case v.class.to_s
+      when 'Parslet::Slice'
+        val = v.str
+        result[k] = Integer(val) rescue val
+      when 'Hash'
+        result[k] = self.remove_parslet(v)
+      when 'Array'
+        result[k] = v.collect { |_| self.remove_parslet(_) }
+      else
+        result[k] = v
       end
+      result
     end
-
-    clean_hash
   end
 end
