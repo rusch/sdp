@@ -32,7 +32,7 @@ class SDP
           SessionDescription.new(session_as_hash[:session_description])
 
         self[:media_descriptions] = session_as_hash[:media_descriptions].map do |md|
-          MediaDescription.new(md[:media_description])
+          MediaDescription.new(md)
         end
       end
     end
