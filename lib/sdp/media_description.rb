@@ -43,6 +43,27 @@ class SDP
       @media = value
     end
 
+    # From RFC 2327:
+    # For applications requiring multiple multicast groups, we allow the
+    # following notation to be used for the connection address:
+    #
+    #     <base multicast address>/<ttl>/<number of addresses>
+
+    def base_multicast_address
+      return nil if !connection_address
+      connection_address.split('/', 2).first
+    end
+
+    def multicast_ttl
+      return nil if !connection_address
+      connection_address.split('/')[1]
+    end
+
+    def multicast_number_of_addresses
+      return nil if !connection_address
+      connection_address.split('/')[2]
+    end
+
     def to_s
       session = ("m=%s %s %s %s\r\n" %
         [ media, transport_port, transport_protocol, transport_format ])
