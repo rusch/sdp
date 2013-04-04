@@ -82,9 +82,32 @@ class SDP::Parser < Parslet::Parser
       (str(':') >> field_value.as(:encryption_key)).maybe >> eol
   end
 
+  rule(:rtcp_attribute) do
+    str('rtcp').as(:attribute) >> str(':') >>
+      field_value.as(:port) >> space >>
+      field_value.as(:network_type) >> space >>
+      field_value.as(:address_type) >> space >>
+      field_value.as(:unicast_address)
+  end
+
+  # rtpmap attribute:
+  # rtpmap:<payload type> <encoding name>/<clock rate>[/<encoding parameters>]
+  rule(:rtpmap_attribute) do
+    str('rtpmap').as(:attribute) >> str(':') >>
+      field_value.as(:payload_type) >> space >>
+      match('[\w\d]').repeat.as(:encoding_name) >> str('/') >>
+      match('\d').repeat.as(:clock_rate) >>
+      ( str('/') >> match('[\w\d]').repeat.as(:encoding_parameters) ).maybe
+  end
+
+  # generic attribute:
+  rule(:generic_attribute) do
+    match('[^:\r\n]').repeat(1).as(:attribute) >>
+      (str(':') >> field_value_string.as(:value)).maybe
+  end
+
   rule(:attribute) do
-    str('a=') >> match('[^:\r\n]').repeat(1).as(:attribute) >>
-      (str(':') >> field_value_string.as(:value)).maybe >> eol
+    str('a=') >> (rtcp_attribute | rtpmap_attribute | generic_attribute) >> eol
   end
 
   rule(:attributes) { attribute.repeat(1).as(:attributes) }

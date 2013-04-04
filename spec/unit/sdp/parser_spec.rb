@@ -9,6 +9,10 @@ describe SDP::Parser do
     }.to_not raise_error Parslet::ParseFailed
   end
 
+  it "parses valid VQE Configs without errors" do
+    lambda { subject.parse VQE_CONFIG }.should_not raise_error
+  end
+
   context "parses" do
     let(:description) { REQUIRED_ONLY }
 
@@ -103,7 +107,7 @@ describe SDP::Parser do
   end
 
   context "attributes" do
-    it "attribute" do
+    it "parses generic attributes" do
       sdp = "a=x-qt-text-cmt:Orban Opticodec-PC\r\n"
       sdp_hash = subject.parse sdp
       sdp_hash[:session_description][:attributes].first[:attribute].should ==
@@ -111,6 +115,40 @@ describe SDP::Parser do
       sdp_hash[:session_description][:attributes].first[:value].should ==
         "Orban Opticodec-PC"
     end
+
+    it "parses rtcp attributes" do
+      sdp = "a=rtcp:49311 IN IP4 178.238.169.68\r\n"
+      sdp_hash = subject.parse sdp
+      attr = sdp_hash[:session_description][:attributes].first
+      attr[:attribute].should       == "rtcp"
+      attr[:port].should            == "49311"
+      attr[:network_type].should    == "IN"
+      attr[:address_type].should    == "IP4"
+      attr[:unicast_address].should == "178.238.169.68"
+    end
+
+    it "parses rtpmap attributes without encoding parameters" do
+      sdp = "a=rtpmap:96 MP2T/90000\r\n"
+      sdp_hash = subject.parse sdp
+      attr = sdp_hash[:session_description][:attributes].first
+      attr[:attribute].should           == "rtpmap"
+      attr[:payload_type].should        == "96"
+      attr[:encoding_name].should       == "MP2T"
+      attr[:clock_rate].should          == "90000"
+      attr[:encoding_parameters].should == nil
+    end
+
+    it "parses rtpmap attributes with encoding parameters" do
+      sdp = "a=rtpmap:96 MP2T/90000/1\r\n"
+      sdp_hash = subject.parse sdp
+      attr = sdp_hash[:session_description][:attributes].first
+      attr[:attribute].should           == "rtpmap"
+      attr[:payload_type].should        == "96"
+      attr[:encoding_name].should       == "MP2T"
+      attr[:clock_rate].should          == "90000"
+      attr[:encoding_parameters].should == "1"
+    end
+
   end
   
   context "media sections" do
@@ -152,9 +190,4 @@ describe SDP::Parser do
     end
   end
 
-  it "parses VQE Configs" do
-    lambda { subject.parse VQE_CONFIG }.should_not raise_error
-    sdp_hash = subject.parse VQE_CONFIG
-    puts sdp_hash[:session_description][:attributes].inspect
-  end
 end

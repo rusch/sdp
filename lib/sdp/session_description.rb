@@ -174,9 +174,20 @@ s=#{name}\r
 
       unless attributes.empty?
         attributes.each do |a|
-          session << "a=#{a[:attribute]}"
-          session << ":#{a[:value]}" if a[:value]
-          session << "\r\n"
+          case a[:attribute]
+          when 'rtcp'
+            session << ("a=rtcp:%i %s %s %s\r\n" %
+              [ a[:port], a[:network_type], a[:address_type], a[:unicast_address] ])
+          when 'rtpmap'
+            session << ("a=rtpmap:%i %s/%i" %
+              [ a[:payload_type], a[:encoding_name], a[:clock_rate]])
+            session << "/#{a[:encoding_parameters]}" if a[:encoding_parameters]
+            session << "\r\n"
+          else
+            session << "a=#{a[:attribute]}"
+            session << ":#{a[:value]}" if a[:value]
+            session << "\r\n"
+          end
         end
       end
 
